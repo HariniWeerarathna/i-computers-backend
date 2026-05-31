@@ -12,7 +12,12 @@ mongoose.connect(mongourl).then(
     () => {
         console.log("Connected to MongoDB")    
     }
+).catch(
+    () => {
+        console.log("Error connecting to MongoDB")    
+    }   
 )
+
 
 
 app.use(express.json()) // stop request - make Inorder(piliwelata haduwa) ---> to read json data from request body.
