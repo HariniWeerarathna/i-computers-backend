@@ -1,6 +1,5 @@
 import express from 'express' 
-import mongoose from 'mongoose'  
-import studentRouter from './routes/studentRouter.js' 
+import mongoose from 'mongoose'   
 import userRouter from './routes/userRouter.js'
 import authenticateUser from './middlewares/authenticate.js'
 import productRouter from './routes/productRouter.js'
@@ -19,7 +18,6 @@ mongoose.connect(mongourl).then(
 app.use(express.json()) // stop request - make Inorder(piliwelata haduwa) ---> to read json data from request body.
 
 app.use( authenticateUser)
-app.use("/students",studentRouter)
 app.use("/users",userRouter)
 app.use("/products", productRouter)
 
