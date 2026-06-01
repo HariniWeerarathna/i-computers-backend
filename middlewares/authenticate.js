@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken"
+import dotenv from 'dotenv'
+dotenv.config() 
 
 export default function authenticateUser(req, res, next) { // stop request
 
@@ -7,7 +9,7 @@ export default function authenticateUser(req, res, next) { // stop request
         if(header != null){
             const token = header.replace("Bearer ", "")
 
-            jwt.verify(token ,"comp99#12@" ,
+            jwt.verify(token ,process.env.JWT_SECRET ,
                 (err , decoded)=>{
 
                     if(decoded == null){
@@ -15,8 +17,7 @@ export default function authenticateUser(req, res, next) { // stop request
                     }else{
                         req.user = decoded
                         next()
-                    }
-                    
+                    }              
                 }
             )
 

@@ -4,9 +4,12 @@ import userRouter from './routes/userRouter.js'
 import authenticateUser from './middlewares/authenticate.js'
 import productRouter from './routes/productRouter.js'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+dotenv.config() // load .env file and add the variables to process.env
+
 
 const app = express() 
-const mongourl = "mongodb://admin:1234@ac-cwrme5v-shard-00-00.pm0ksjd.mongodb.net:27017,ac-cwrme5v-shard-00-01.pm0ksjd.mongodb.net:27017,ac-cwrme5v-shard-00-02.pm0ksjd.mongodb.net:27017/?ssl=true&replicaSet=atlas-14h5x5-shard-0&authSource=admin&appName=Cluster0"
+const mongourl = process.env.MONGO_URI
 
 mongoose.connect(mongourl).then(
     () => {
