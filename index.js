@@ -4,6 +4,7 @@ import userRouter from './routes/userRouter.js'
 import authenticateUser from './middlewares/authenticate.js'
 import productRouter from './routes/productRouter.js'
 import jwt from 'jsonwebtoken'
+import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config() // load .env file and add the variables to process.env
 
@@ -25,6 +26,7 @@ mongoose.connect(mongourl).then(
 
 app.use(express.json()) // stop request - make Inorder(piliwelata haduwa) ---> to read json data from request body.
 
+app.use(cors()) // middleware to allow cross-origin requests
 app.use( authenticateUser)
 app.use("/users",userRouter)
 app.use("/products", productRouter)

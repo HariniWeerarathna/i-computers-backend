@@ -35,7 +35,6 @@ export async function createUser(req, res) {
 
 
 
-
 export async function loginUser(req, res) {
    
     try {
@@ -67,7 +66,7 @@ export async function loginUser(req, res) {
             }
 
             const token = jwt.sign(userInfo , process.env.JWT_SECRET)
-            res.json({ token : token })
+            res.json({ token : token , isAdmin : user.isAdmin});
 
         } else{
             res.status(401).json({ message: "Invalid password" });
@@ -81,9 +80,6 @@ export async function loginUser(req, res) {
         // 500 - internal server error 
     }
 }
-
-
-
 
 
 
