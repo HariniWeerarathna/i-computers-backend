@@ -17,11 +17,11 @@ export default function authenticateUser(req, res, next) { // stop request
                     }else{
                         req.user = decoded
                         next()
-                    }              
+                    }             
                 }
             )
 
         }else{
-        next() // continue request
+        next() // continue request 
         }
     }

@@ -29,7 +29,7 @@ export async function createUser(req, res) {
 
     }catch(error){
         console.error("Error creating user:", error);
-        return res.json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
