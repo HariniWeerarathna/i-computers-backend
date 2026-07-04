@@ -16,7 +16,7 @@ export async function createProduct(req, res) {
 
     }catch (error) {
         console.error("Error creating product:", error);
-        return res.json({message: "Internal Server Error"})
+        return res.status(500).json({message: "Internal Server Error"})
     }
 }
 
@@ -24,6 +24,7 @@ export async function createProduct(req, res) {
 
 
 export async function getAllProducts(req, res) {
+    console.log("Fetching all products");
 
     try {
         if(isAdmin(req)){
