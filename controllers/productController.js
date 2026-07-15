@@ -103,11 +103,20 @@ export async function updateProduct(req, res) {
 }
 
 
+//Delay for outer website ones
+async function halfsecondsDelay() {
+    return new Promise(resolve => setTimeout(resolve, 500));
+}
+
+
+
+
 
 
 
 export async function getProductById(req, res) {
     try{
+        await halfsecondsDelay(); // simulate a delay for 0.5 second
 
         const productId = req.params.Id;
         const product = await Product.findOne({productId : productId});
