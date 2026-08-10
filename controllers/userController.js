@@ -35,6 +35,7 @@ export async function createUser(req, res) {
 
 
 
+
 export async function loginUser(req, res) {
    
     try {
@@ -80,6 +81,144 @@ export async function loginUser(req, res) {
         // 500 - internal server error 
     }
 }
+
+
+
+
+
+
+export async function getAllUsers(req,res){
+
+    if(!isAdmin(req)){
+        res.status(403).json({ message: "You are not authorized to view all users" });
+        return
+    }
+
+    const pageSizeInString  = req.params.pageSize||"10" //"3"
+    const pageNumberInString = req.params.pageNumber||"1" //"2"
+
+    const pageSize = parseInt(pageSizeInString) //10
+    const pageNumber = parseInt(pageNumberInString) //1
+
+
+    try{    
+
+        const totalUserCount = await User.countDocuments();
+        const totalPages = Math.ceil(totalUserCount / pageSize)
+        const pagesNeededToBeSkipped = pageNumber - 1
+        const itemsNeededtoBeSkipped = pagesNeededToBeSkipped * pageSize
+        const users = await User.find().skip(itemsNeededtoBeSkipped).limit(pageSize)
+
+        return res.json({ users : users , totalPages : totalPages , currentPage : pageNumber , totalCount : totalUserCount });
+
+    }catch(error){
+        console.error("Error getting all users:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+}
+
+
+
+
+export async function updateUserStatus(req,res){
+
+    if(!isAdmin(req)){
+        res.status(403).json({ message: "You are not authorized to update user status" });
+        return
+    }
+
+    const email = req.body.email;
+    const isBlocked = req.body.isBlocked;
+
+    try{
+
+        if(email == req.user.email){
+            res.status(400).json({ message: "You cannot update your own status" });
+            return
+        }
+
+        const user = await User.findOne({email : email})
+        if(user == null){
+            res.status(404).json({ message: "User does not exist" });
+            return
+        }
+
+        await User.findOneAndUpdate({email : email} , {isBlocked : isBlocked})
+        res.json({ message: "User status updated successfully" });
+
+    }catch(error){
+        console.error("Error updating user status:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+
+
+
+
+export async function updateUserRole(req,res){
+
+    if(!isAdmin(req)){
+        res.status(403).json({ message: "You are not authorized to update user role" });
+        return
+    }
+
+    const email = req.body.email;
+    const isAdminRole = req.body.isAdmin;
+
+    try{
+
+        if(email == req.user.email){
+            res.status(400).json({ message: "You cannot update your own role" });
+            return
+        }
+
+
+        const user = await User.findOne({email : email})
+        if(user == null){
+            res.status(404).json({ message: "User does not exist" });
+            return
+        }
+
+        await User.findOneAndUpdate({email : email} , {isAdmin : isAdminRole})
+        res.json({ message: "User role updated successfully" });
+        
+    }catch(error){
+        console.error("Error updating user role:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+
+
+
+
+
+export async function getCurrentUser(req,res){
+
+    if(req.user == null){
+        res.status(401).json({ message: "You are not logged in" });
+        return
+    }
+
+    try{
+        const user = await User.findOne({email : req.user.email})
+
+        if(user == null){
+            res.status(404).json({ message: "User does not exist" });
+            return
+        }
+        res.json({ user : user });
+
+    }catch(error){
+        console.error("Error getting current user:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+}
+
+
 
 
 

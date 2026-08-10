@@ -1,5 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import { isAdmin } from "./userController.js";
 
 export async function createOrder(req,res){
 
@@ -164,6 +165,38 @@ export async function getOrders(req , res){
 
     }catch(error){
         console.error("Error getting orders:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+
+
+
+export async function updateOrderStatus(req , res){
+
+    if(!isAdmin(req)){
+        res.status(403).json({ message: "You are not authorized to update order status" });
+        return
+    }
+
+    const orderId = req.params.orderId
+    const newStatus = req.params.status
+
+    try{
+
+        const order = await Order.findOne({ orderId : orderId })
+
+        if(order == null){
+            res.status(404).json({ message: "Order with orderId " + orderId + " does not exist" });
+            return
+        }
+
+        await Order.updateOne({ orderId : orderId }, { status : newStatus })
+
+        res.json({ message: "Order status updated successfully" });
+
+    }catch(error){
+        console.error("Error updating order status:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
