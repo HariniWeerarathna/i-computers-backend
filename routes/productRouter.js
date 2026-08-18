@@ -1,10 +1,11 @@
 import express from "express";
-import {createProduct,getAllProducts,deleteProduct,updateProduct,getProductById} from "../controllers/productController.js";
+import {createProduct,getAllProducts,deleteProduct,updateProduct,searchProducts,getProductById} from "../controllers/productController.js";
 
 const productRouter = express.Router();
 
 productRouter.post("/", createProduct);
 productRouter.get("/", getAllProducts);
+productRouter.get("/search/:query", searchProducts)
 
 productRouter.delete("/:Id", deleteProduct);// x is a param for productId
 //Delete request ----> localhost:3000/products/LAP001
