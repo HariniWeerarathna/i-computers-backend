@@ -1,6 +1,7 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -51,6 +52,11 @@ export async function loginUser(req, res) {
             //404 - no user in given email address
         }
 
+        if(user.isBlocked){
+            res.status(403).json({ message: "User is blocked" });
+            return
+        }
+
 
         const isPasswordMatching = bcrypt.compareSync(password, user.password);
         
@@ -67,7 +73,7 @@ export async function loginUser(req, res) {
             }
 
             const token = jwt.sign(userInfo , process.env.JWT_SECRET)
-            res.json({ token : token , isAdmin : user.isAdmin});
+            res.json({ token : token , isAdmin : user.isAdmin , user : user});
 
         } else{
             res.status(401).json({ message: "Invalid password" });
@@ -314,3 +320,82 @@ export function isAdmin(req, res) {
     return
     }
 */
+
+
+
+
+export async function googleLogin(req,res){
+
+    const accessToken = req.body.accessToken;
+
+    try{
+
+        const googleResponse = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo",{
+            headers : {
+                Authorization : `Bearer ${accessToken}`
+            }
+        })
+
+
+        const user = await User.findOne({email : googleResponse.data.email})
+
+        if(user == null){
+
+            const randomPassword = Math.random().toString(36).slice(-8);
+
+            const passwordHash = bcrypt.hashSync(randomPassword, 10);
+
+            const newUser = new User({
+                email : googleResponse.data.email,
+                firstName : googleResponse.data.given_name,
+                lastName : googleResponse.data.family_name || "User",
+                password : passwordHash,
+                image : googleResponse.data.picture,
+                isEmailVerified : googleResponse.data.email_verified
+            })
+
+            const savedUser = await newUser.save();
+
+            const userInfo = {
+                email : savedUser.email,
+                firstName : savedUser.firstName,
+                lastName : savedUser.lastName,
+                image : savedUser.image,
+                emailVerified : savedUser.isEmailVerified,
+                isAdmin : savedUser.isAdmin,
+                isBlocked : savedUser.isBlocked
+            }
+
+            const token = jwt.sign(userInfo , process.env.JWT_SECRET)
+
+            res.json({ token : token , isAdmin : savedUser.isAdmin , user : savedUser });
+
+
+        }else{
+
+            if(user.isBlocked){
+                res.status(403).json({ message: "User is blocked" });
+                return
+            }
+
+            const userInfo = {
+                email : user.email,
+                firstName : user.firstName,
+                lastName : user.lastName,
+                image : user.image,
+                emailVerified : user.isEmailVerified,
+                isAdmin : user.isAdmin,
+                isBlocked : user.isBlocked
+            }
+
+            const token = jwt.sign(userInfo , process.env.JWT_SECRET)
+
+            res.json({ token : token , isAdmin : user.isAdmin , user : user });
+
+        }
+
+    }catch(error){
+        console.error("Error logging in with Google:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
