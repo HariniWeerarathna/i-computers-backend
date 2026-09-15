@@ -4,6 +4,7 @@ import userRouter from './routes/userRouter.js'
 import authenticateUser from './middlewares/authenticate.js'
 import productRouter from './routes/productRouter.js'
 import orderRouter from './routes/orderRouter.js'
+import reviewRouter from './routes/reviewRouter.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config() // load .env file and add the variables to process.env
@@ -31,6 +32,7 @@ app.use( authenticateUser)
 app.use("/api/users",userRouter)
 app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
+app.use("/api/reviews", reviewRouter)
 
 // 1-1023 not used
 app.listen(3000,
