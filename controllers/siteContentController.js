@@ -37,7 +37,7 @@ export async function updateAboutContent(req, res) {
         const content = await SiteContent.findOneAndUpdate(
             { key: "about" },
             { key: "about", title, introduction, supportingText, buttonText, values },
-            { new: true, upsert: true, runValidators: true },
+            { returnDocument: "after", upsert: true, runValidators: true },
         );
         res.json({ message: "About page updated successfully", content });
     } catch (error) {

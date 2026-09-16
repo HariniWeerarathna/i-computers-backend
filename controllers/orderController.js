@@ -1,6 +1,8 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 import { isAdmin } from "./userController.js";
+import User from "../models/user.js";
+import Notification from "../models/notification.js";
 
 export async function createOrder(req,res){
 
@@ -104,6 +106,19 @@ export async function createOrder(req,res){
         //order creation
         const order = new Order(orderData)
         await order.save()
+
+        const admins = await User.find({ isAdmin: true }).select("email");
+        if (admins.length > 0) {
+            await Notification.create({
+                type: "new-order",
+                title: "New order received",
+                message: `${order.firstName} ${order.lastName} placed order ${order.orderId}.`,
+                customerName: `${order.firstName} ${order.lastName}`,
+                customerImage: req.user.image || "/images/default-profile.png",
+                link: "/admin",
+                recipientEmails: admins.map((admin) => admin.email)
+            });
+        }
         
 
         //update stock of products

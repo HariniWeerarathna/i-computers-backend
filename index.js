@@ -6,6 +6,7 @@ import productRouter from './routes/productRouter.js'
 import orderRouter from './routes/orderRouter.js'
 import reviewRouter from './routes/reviewRouter.js'
 import siteContentRouter from './routes/siteContentRouter.js'
+import notificationRouter from './routes/notificationRouter.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config() // load .env file and add the variables to process.env
@@ -35,6 +36,7 @@ app.use("/api/products", productRouter)
 app.use("/api/orders", orderRouter)
 app.use("/api/reviews", reviewRouter)
 app.use("/api/content", siteContentRouter)
+app.use("/api/notifications", notificationRouter)
 
 // 1-1023 not used
 app.listen(3000,

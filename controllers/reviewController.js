@@ -122,7 +122,7 @@ export async function hideReviewFromAdmin(req, res) {
         const review = await Review.findByIdAndUpdate(
             req.params.reviewId,
             { isAdminHidden: true },
-            { new: true },
+            { returnDocument: "after" },
         );
 
         if (review == null) {

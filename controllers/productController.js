@@ -1,5 +1,7 @@
 import Product from "../models/product.js";
 import {isAdmin} from "./userController.js";
+import User from "../models/user.js";
+import Notification from "../models/notification.js";
 
 export async function createProduct(req, res) {
     try {
@@ -7,6 +9,16 @@ export async function createProduct(req, res) {
         if(isAdmin(req)){
             const product = new Product(req.body);
             await product.save();
+            const users = await User.find().select("email");
+            if (users.length > 0) {
+                await Notification.create({
+                    type: "new-product",
+                    title: "New product available",
+                    message: `${product.name} has just been added to our store.`,
+                    link: `/overview/${product.productId}`,
+                    recipientEmails: users.map((user) => user.email)
+                });
+            }
             res.json({message: "Product created successfully"}) 
         }
         else{
@@ -88,7 +100,20 @@ export async function updateProduct(req, res) {
                 return
             }
         
+            const priceChanged = Number(product.price) !== Number(req.body.price);
             await Product.findOneAndUpdate({productId : productId}, req.body);
+            if (priceChanged) {
+                const users = await User.find().select("email");
+                if (users.length > 0) {
+                    await Notification.create({
+                        type: "new-product",
+                        title: "Price updated",
+                        message: `The price of ${product.name} has been updated.`,
+                        link: `/overview/${product.productId}`,
+                        recipientEmails: users.map((user) => user.email)
+                    });
+                }
+            }
             res.json({message: "Product updated successfully"})
         
         }else{
