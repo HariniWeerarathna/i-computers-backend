@@ -22,6 +22,10 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         default: "/images/default-profile.png"
     },
+    customerEmail: {
+        type: String,
+        default: ""
+    },
     link: {
         type: String,
         default: "/"

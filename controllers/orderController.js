@@ -115,6 +115,7 @@ export async function createOrder(req,res){
                 message: `${order.firstName} ${order.lastName} placed order ${order.orderId}.`,
                 customerName: `${order.firstName} ${order.lastName}`,
                 customerImage: req.user.image || "/images/default-profile.png",
+                customerEmail: order.email,
                 link: "/admin",
                 recipientEmails: admins.map((admin) => admin.email)
             });
